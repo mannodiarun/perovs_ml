@@ -3,6 +3,6 @@
 #
 # jupyter tool
 #
-/usr/bin/invoke_app "$@" -t hubtoolshortname \
-                         -C "start_jupyter -t -T @tool hubtoolshortname.ipynb" \
+/usr/bin/invoke_app "$@" -t perovshepml \
+                         -C "start_jupyter -t -T @tool perovshepml.ipynb" \
                          -u anaconda-6
