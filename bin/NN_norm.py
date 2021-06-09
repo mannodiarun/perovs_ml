@@ -1,5 +1,13 @@
-# Regression Example With Boston Dataset: Standardized
+#!/usr/bin/env python
+# coding: utf-8
+
+# This notebook reads a DFT dataset of ABX3 perovskites and trains ML models for predicting their band gaps (PBE and HSE), refractive index, and photovoltaic figure of merit.
+
+# In[31]:
+
+
 from pandas import read_csv
+import tensorflow.keras as keras
 from keras.models import Sequential
 from keras.layers import Dropout
 from keras.layers import Dense
@@ -13,7 +21,10 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
-#from __future__ import print_function
+
+# In[ ]:
+
+
 import numpy as np     
 import csv 
 import copy 
@@ -24,13 +35,15 @@ import matplotlib.pyplot as plt
 #from mlpy import KernelRidge                                                                                                                                                     
 
 
+# In[33]:
 
-    # Read Data
+
+# Read Data
 ifile  = open('Data.csv', "rt")
 reader = csv.reader(ifile)
 csvdata=[]
 for row in reader:
-        csvdata.append(row)   
+    csvdata.append(row)   
 ifile.close()
 numrow=len(csvdata)
 numcol=len(csvdata[0]) 
@@ -48,19 +61,19 @@ PBE_gap  = csvdata[:,9]
 HSE_gap  = csvdata[:,10]
 Ref_ind  = csvdata[:,11]
 FOM      = csvdata[:,12]
-
-#Y = csvdata[:,5:9]
-Y = csvdata[:,9:13]
+Y = csvdata[:,5:9]
 X = csvdata[:,13:]
 
 
+# In[34]:
 
-    # Read Outside Data
+
+# Read Outside Data
 ifile  = open('Outside_norm.csv', "rt")
 reader = csv.reader(ifile)
 csvdata=[]
 for row in reader:
-        csvdata.append(row)
+    csvdata.append(row)
 ifile.close()
 numrow=len(csvdata)
 numcol=len(csvdata[0])
@@ -73,93 +86,69 @@ X_out = csvdata[:,4:]
 
 n_out = C_out.size
 
-
-
-
-
-
-
-
-
-
 YY = copy.deepcopy(Y)
 XX = copy.deepcopy(X)
 n = C.size
-m = np.int(X.size/n)
-m_y = np.int(Y.size/n)
+m = int(X.size/n)
+m_y = int(Y.size/n)
 #m_y = 4
+
+
+# In[35]:
+
 
 t = 0.20
 
 X_train, X_test, Prop_train, Prop_test, Prop_train_pbe_gap, Prop_test_pbe_gap, Prop_train_hse_gap, Prop_test_hse_gap, Prop_train_ref_ind, Prop_test_ref_ind, Prop_train_fom, Prop_test_fom  =  train_test_split(XX, YY, PBE_gap, HSE_gap, Ref_ind, FOM, test_size=t)
 
-#X_train = copy.deepcopy(X)
-#X_test  = copy.deepcopy(X)
-#Prop_train = copy.deepcopy(prop)
-#Prop_test  = copy.deepcopy(prop)
-
-
-n_tr = np.int(Prop_train.size/m_y)
-n_te = np.int(Prop_test.size/m_y)
-
+n_tr = int(Prop_train.size/m_y)
+n_te = int(Prop_test.size/m_y)
 
 Prop_train_fl = [[0.0 for a in range(m_y)] for b in range(n_tr)]
 for i in range(0,n_tr):
     for j in range(0,m_y):
-        Prop_train_fl[i][j] = np.float(Prop_train[i][j])
-
+        Prop_train_fl[i][j] = float(Prop_train[i][j])
+        
 Prop_test_fl = [[0.0 for a in range(m_y)] for b in range(n_te)]
 for i in range(0,n_te):
     for j in range(0,m_y):
-        Prop_test_fl[i][j] = np.float(Prop_test[i][j])
+        Prop_test_fl[i][j] = float(Prop_test[i][j])
  
 X_train_fl = [[0.0 for a in range(m)] for b in range(n_tr)]
 for i in range(0,n_tr):
     for j in range(0,m):
-        X_train_fl[i][j] = np.float(X_train[i][j])
-
+        X_train_fl[i][j] = float(X_train[i][j])
+        
 X_test_fl = [[0.0 for a in range(m)] for b in range(n_te)]
 for i in range(0,n_te):
     for j in range(0,m):
-        X_test_fl[i][j] = np.float(X_test[i][j])
-
-
-
-
+        X_test_fl[i][j] = float(X_test[i][j])
+        
+        
 pbe_gap_fl = [0.0]*n
 hse_gap_fl = [0.0]*n
 ref_ind_fl = [0.0]*n
 fom_fl = [0.0]*n
 
 for i in range(0,n):
-    pbe_gap_fl[i] = np.float(PBE_gap[i])
-    hse_gap_fl[i] = np.float(HSE_gap[i])
-    ref_ind_fl[i] = np.float(Ref_ind[i])
-    fom_fl[i] = np.float(FOM[i])
-
-max_range_pbe_gap = np.float ( np.max(pbe_gap_fl[:]) )
-min_range_pbe_gap = np.float ( np.min(pbe_gap_fl[:]) )
-
-max_range_hse_gap = np.float ( np.max(hse_gap_fl[:]) )
-min_range_hse_gap = np.float ( np.min(hse_gap_fl[:]) )
-
-max_range_ref_ind = np.float ( np.max(ref_ind_fl[:]) )
-min_range_ref_ind = np.float ( np.min(ref_ind_fl[:]) )
-
-max_range_fom = np.float ( np.max(fom_fl[:]) )
-min_range_fom = np.float ( np.min(fom_fl[:]) )
+    pbe_gap_fl[i] = float(PBE_gap[i])
+    hse_gap_fl[i] = float(HSE_gap[i])
+    ref_ind_fl[i] = float(Ref_ind[i])
+    fom_fl[i] = float(FOM[i])
+    
+max_range_pbe_gap = float ( np.max(pbe_gap_fl[:]) )
+min_range_pbe_gap = float ( np.min(pbe_gap_fl[:]) )
+max_range_hse_gap = float ( np.max(hse_gap_fl[:]) )
+min_range_hse_gap = float ( np.min(hse_gap_fl[:]) )
+max_range_ref_ind = float ( np.max(ref_ind_fl[:]) )
+min_range_ref_ind = float ( np.min(ref_ind_fl[:]) )
+x_range_fom = float ( np.max(fom_fl[:]) )
+min_range_fom = float ( np.min(fom_fl[:]) )
 
 
+#  NN Optimizers and Model Definition
 
-
-
-
-
-
-
-
-
-## NN Optimizers and Model Definition
+# In[38]:
 
 
 pipelines = []
@@ -174,14 +163,12 @@ ep = [200, 400, 600]
 bs = [50, 100, 200]
 
 count = 0
-
 for a in range(0,3):
     for b in range(0,3):
         for c in range(0,3):
             for d in range(0,3):
                 for e in range(0,3):
                     for f in range(0,3):
-
                         parameters[count][0] = lr[a]
                         parameters[count][1] = n1[b]
                         parameters[count][2] = dp[c]
@@ -190,8 +177,8 @@ for a in range(0,3):
                         parameters[count][5] = bs[f]
                         count = count+1
                         
-                        keras.optimizers.Adam(learning_rate=lr[a], beta_1=0.9, beta_2=0.999, amsgrad=False)
-
+                        keras.optimizers.Adam(lr=lr[a], beta_1=0.9, beta_2=0.999, amsgrad=False)
+                        
                         # define base model
                         def baseline_model():
                             model = Sequential()
@@ -202,26 +189,20 @@ for a in range(0,3):
                             model.add(Dense(1, kernel_initializer='normal'))
                             model.compile(loss='mean_squared_error', optimizer='Adam')
                             return model
-
                         # evaluate model with standardized dataset
                         estimators = []
                         estimators.append(('standardize', StandardScaler()))
                         estimators.append(('mlp', KerasRegressor(build_fn=baseline_model, epochs=ep[e], batch_size=bs[f], verbose=0)))
                         pipelines.append ( Pipeline(estimators) )
-
-
-
+                        
+#print(lr[a])
 
 times = 5
 
 
+#  Train Model For PBE Band Gap ##
 
-
-
-
-
-
-## Train Model For PBE Band Gap ##
+# In[39]:
 
 
 #times = 25
@@ -245,10 +226,8 @@ for i in range(0,times):
         pipeline.fit(X_train_cv,Prop_train_cv)
         Prop_pred_train_cv = pipeline.predict(X_train_cv)
         Prop_pred_test_cv  = pipeline.predict(X_test_cv)
-
         n_te_cv = Prop_test_cv.size
         n_tr_cv = Prop_train_cv.size
-
         Prop_test_cv_fl = [0.0]*n_te_cv
         Prop_pred_test_cv_fl = [0.0]*n_te_cv
         for aa in range(0,n_te_cv):
@@ -259,7 +238,6 @@ for i in range(0,times):
         for aa in range(0,n_tr_cv):
             Prop_train_cv_fl[aa] = np.float(Prop_train_cv[aa])
             Prop_pred_train_cv_fl[aa] = np.float(Prop_pred_train_cv[aa])
-
         mse_test_cv = mse_test_cv  + sklearn.metrics.mean_squared_error(Prop_test_cv_fl, Prop_pred_test_cv_fl)
         mse_train_cv = mse_train_cv + sklearn.metrics.mean_squared_error(Prop_train_cv_fl, Prop_pred_train_cv_fl)
     mse_test = mse_test_cv / n_fold
@@ -287,9 +265,9 @@ for i in range(0,n_tr):
 for i in range(0,n_te):
     Pred_test_pbe_gap_fl[i] = np.float(Pred_test[i])
     Prop_test_pbe_gap_fl[i] = np.float(Prop_test_pbe_gap[i])
-
-
-## Outside Predictions
+    
+    
+## Outside Predictions ##
 
 Pred_out = pipeline_opt.predict(X_out)
 Pred_out_pbe_gap = [0.0]*n_out
@@ -297,21 +275,9 @@ for i in range(0,n_out):
     Pred_out_pbe_gap[i] = np.float(Pred_out[i])
 
 
+#  Train Model For HSE Band Gap ##
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Train Model For HSE Band Gap ##
+# In[ ]:
 
 
 #times = 25
@@ -335,10 +301,8 @@ for i in range(0,times):
         pipeline.fit(X_train_cv,Prop_train_cv)
         Prop_pred_train_cv = pipeline.predict(X_train_cv)
         Prop_pred_test_cv  = pipeline.predict(X_test_cv)
-
         n_te_cv = Prop_test_cv.size
         n_tr_cv = Prop_train_cv.size
-
         Prop_test_cv_fl = [0.0]*n_te_cv
         Prop_pred_test_cv_fl = [0.0]*n_te_cv
         for aa in range(0,n_te_cv):
@@ -349,7 +313,6 @@ for i in range(0,times):
         for aa in range(0,n_tr_cv):
             Prop_train_cv_fl[aa] = np.float(Prop_train_cv[aa])
             Prop_pred_train_cv_fl[aa] = np.float(Prop_pred_train_cv[aa])
-
         mse_test_cv = mse_test_cv  + sklearn.metrics.mean_squared_error(Prop_test_cv_fl, Prop_pred_test_cv_fl)
         mse_train_cv = mse_train_cv + sklearn.metrics.mean_squared_error(Prop_train_cv_fl, Prop_pred_train_cv_fl)
     mse_test = mse_test_cv / n_fold
@@ -377,9 +340,9 @@ for i in range(0,n_tr):
 for i in range(0,n_te):
     Pred_test_hse_gap_fl[i] = np.float(Pred_test[i])
     Prop_test_hse_gap_fl[i] = np.float(Prop_test_hse_gap[i])
-
-
-## Outside Predictions
+    
+    
+## Outside Predictions ##
 
 Pred_out = pipeline_opt.predict(X_out)
 Pred_out_hse_gap = [0.0]*n_out
@@ -387,20 +350,9 @@ for i in range(0,n_out):
     Pred_out_hse_gap[i] = np.float(Pred_out[i])
 
 
+#  Train Model For Refractive Index ##
 
-
-
-
-
-
-
-
-
-
-
-
-
-## Train Model For Refractive Index ##
+# In[ ]:
 
 
 #times = 25
@@ -424,10 +376,8 @@ for i in range(0,times):
         pipeline.fit(X_train_cv,Prop_train_cv)
         Prop_pred_train_cv = pipeline.predict(X_train_cv)
         Prop_pred_test_cv  = pipeline.predict(X_test_cv)
-
         n_te_cv = Prop_test_cv.size
         n_tr_cv = Prop_train_cv.size
-
         Prop_test_cv_fl = [0.0]*n_te_cv
         Prop_pred_test_cv_fl = [0.0]*n_te_cv
         for aa in range(0,n_te_cv):
@@ -438,7 +388,6 @@ for i in range(0,times):
         for aa in range(0,n_tr_cv):
             Prop_train_cv_fl[aa] = np.float(Prop_train_cv[aa])
             Prop_pred_train_cv_fl[aa] = np.float(Prop_pred_train_cv[aa])
-
         mse_test_cv = mse_test_cv  + sklearn.metrics.mean_squared_error(Prop_test_cv_fl, Prop_pred_test_cv_fl)
         mse_train_cv = mse_train_cv + sklearn.metrics.mean_squared_error(Prop_train_cv_fl, Prop_pred_train_cv_fl)
     mse_test = mse_test_cv / n_fold
@@ -466,9 +415,9 @@ for i in range(0,n_tr):
 for i in range(0,n_te):
     Pred_test_ref_ind_fl[i] = np.float(Pred_test[i])
     Prop_test_ref_ind_fl[i] = np.float(Prop_test_ref_ind[i])
-
-
-## Outside Predictions
+    
+    
+## Outside Predictions ##
 
 Pred_out = pipeline_opt.predict(X_out)
 Pred_out_ref_ind = [0.0]*n_out
@@ -476,21 +425,9 @@ for i in range(0,n_out):
     Pred_out_ref_ind[i] = np.float(Pred_out[i])
 
 
+#  Train Model For Figure of Merit ##
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Train Model For Figure of Merit ##
+# In[ ]:
 
 
 #times = 25
@@ -514,10 +451,8 @@ for i in range(0,times):
         pipeline.fit(X_train_cv,Prop_train_cv)
         Prop_pred_train_cv = pipeline.predict(X_train_cv)
         Prop_pred_test_cv  = pipeline.predict(X_test_cv)
-
         n_te_cv = Prop_test_cv.size
         n_tr_cv = Prop_train_cv.size
-
         Prop_test_cv_fl = [0.0]*n_te_cv
         Prop_pred_test_cv_fl = [0.0]*n_te_cv
         for aa in range(0,n_te_cv):
@@ -528,7 +463,6 @@ for i in range(0,times):
         for aa in range(0,n_tr_cv):
             Prop_train_cv_fl[aa] = np.float(Prop_train_cv[aa])
             Prop_pred_train_cv_fl[aa] = np.float(Prop_pred_train_cv[aa])
-
         mse_test_cv = mse_test_cv  + sklearn.metrics.mean_squared_error(Prop_test_cv_fl, Prop_pred_test_cv_fl)
         mse_train_cv = mse_train_cv + sklearn.metrics.mean_squared_error(Prop_train_cv_fl, Prop_pred_train_cv_fl)
     mse_test = mse_test_cv / n_fold
@@ -556,9 +490,9 @@ for i in range(0,n_tr):
 for i in range(0,n_te):
     Pred_test_fom_fl[i] = np.float(Pred_test[i])
     Prop_test_fom_fl[i] = np.float(Prop_test_fom[i])
-
-
-## Outside Predictions
+    
+    
+## Outside Predictions ##
 
 Pred_out = pipeline_opt.predict(X_out)
 Pred_out_fom = [0.0]*n_out
@@ -566,17 +500,7 @@ for i in range(0,n_out):
     Pred_out_fom[i] = np.float(Pred_out[i])
 
 
-
-
-
-
-
-
-
-
-
-
-
+# In[ ]:
 
 
 errors = [[0.0 for a in range(8)] for b in range(times)]
@@ -590,11 +514,11 @@ for i in range(0,times):
     errors[i][5] = test_errors_ref_ind[i]
     errors[i][6] = train_errors_fom[i]
     errors[i][7] = test_errors_fom[i]
-
+    
 np.savetxt('errors.txt', errors)
 
 
-
+# In[ ]:
 
 
 Pred_out = [[0.0 for a in range(4)] for b in range(n_out)]
@@ -604,18 +528,11 @@ for i in range(0,n_out):
     Pred_out[i][1] = Pred_out_hse_gap[i]
     Pred_out[i][2] = Pred_out_ref_ind[i]
     Pred_out[i][3] = Pred_out_fom[i]
-
+    
 np.savetxt('Pred_out.txt', Pred_out)
 
 
-
-
-
-
-
-
-
-
+# In[ ]:
 
 
 mse_test_prop  = sklearn.metrics.mean_squared_error(Prop_test_pbe_gap_fl, Pred_test_pbe_gap_fl)
@@ -651,50 +568,20 @@ print('rmse_train_fom = ', np.sqrt(mse_train_prop))
 print('      ')
 
 
+#  ML Parity Plots ##
 
+# In[ ]:
 
-
-
-
-
-
-
-
-
-
-
-
-
-## ML Parity Plots ##
-
-
-#fig, ( [ax1, ax2], [ax3, ax4], [ax5, ax6] ) = plt.subplots( nrows=3, ncols=2, figsize=(6,6) )
-
-#fig, ( [ax1, ax2], [ax3, ax4] ) = plt.subplots( nrows=2, ncols=2, sharex=True, sharey=True, figsize=(8,8) )
 
 fig, ( [ax1, ax2], [ax3, ax4] ) = plt.subplots( nrows=2, ncols=2, figsize=(8,8) )
 
-#fig, ( [ax1, ax2, ax3] ) = plt.subplots( nrows=1, ncols=3, figsize=(12,4) )
-
 fig.text(0.5, 0.02, 'DFT Calculation', ha='center', fontsize=32)
 fig.text(0.01, 0.5, 'ML Prediction', va='center', rotation='vertical', fontsize=32)
-
-#fig, axes2d = plt.subplots(nrows=3, ncols=3, sharex=True, sharey=True, figsize=(6,6))
 
 plt.subplots_adjust(left=0.12, bottom=0.12, right=0.97, top=0.94, wspace=0.3, hspace=0.35)
 plt.rc('font', family='Arial narrow')
 #plt.tight_layout()
 #plt.tight_layout(pad=0.6, w_pad=0.5, h_pad=0.5)
-
-#plt.ylabel('ML Prediction', fontname='Arial Narrow', size=32)
-#plt.xlabel('DFT Calculation', fontname='Arial Narrow', size=32)
-
-
-
-
-
-
-
 
 
 
@@ -702,186 +589,98 @@ Prop_train_temp = copy.deepcopy(Prop_train_pbe_gap_fl)
 Pred_train_temp = copy.deepcopy(Pred_train_pbe_gap_fl)
 Prop_test_temp  = copy.deepcopy(Prop_test_pbe_gap_fl)
 Pred_test_temp  = copy.deepcopy(Pred_test_pbe_gap_fl)
-
 a = [-175,0,125]
 b = [-175,0,125]
 ax1.plot(b, a, c='k', ls='-')
-
 ax1.xaxis.set_tick_params(labelsize=20)
 ax1.yaxis.set_tick_params(labelsize=20)
-
 ax1.scatter(Prop_train_temp[:], Pred_train_temp[:], c='blue', marker='s', s=60, edgecolors='dimgrey', alpha=1.0, label='Training')
 ax1.scatter(Prop_test_temp[:], Pred_test_temp[:], c='orange', marker='s', s=60, edgecolors='dimgrey', alpha=0.2, label='Test')
-
 te = '%.2f' % rmse_test_pbe_gap
 tr = '%.2f' % rmse_train_pbe_gap
-
 ax1.text(2.95, 0.8, 'Test_rmse = ', c='r', fontsize=12)
 ax1.text(4.61, 0.8, te, c='r', fontsize=12)
 ax1.text(5.22, 0.8, 'eV', c='r', fontsize=12)
 ax1.text(2.84, 0.32, 'Train_rmse = ', c='r', fontsize=12)
 ax1.text(4.60, 0.32, tr, c='r', fontsize=12)
 ax1.text(5.22, 0.32, 'eV', c='r', fontsize=12)
-
 ax1.set_ylim([-0.2, 5.8])
 ax1.set_xlim([-0.2, 5.8])
 ax1.set_xticks([1, 2, 3, 4, 5])
 ax1.set_yticks([1, 2, 3, 4, 5])
-
 ax1.set_title('PBE Band Gap (eV)', c='k', fontsize=20, pad=8)
-
 ax1.legend(loc='upper left',ncol=1, frameon=True, prop={'family':'Arial narrow','size':12})
-
-
-
-
-
 
 
 Prop_train_temp = copy.deepcopy(Prop_train_hse_gap_fl)
 Pred_train_temp = copy.deepcopy(Pred_train_hse_gap_fl)
 Prop_test_temp  = copy.deepcopy(Prop_test_hse_gap_fl)
 Pred_test_temp  = copy.deepcopy(Pred_test_hse_gap_fl)
-
-a = [-175,0,125]
-b = [-175,0,125]
-ax2.plot(b, a, c='k', ls='-')
-
 ax2.xaxis.set_tick_params(labelsize=20)
 ax2.yaxis.set_tick_params(labelsize=20)
-
 ax2.scatter(Prop_train_temp[:], Pred_train_temp[:], c='blue', marker='s', s=60, edgecolors='dimgrey', alpha=1.0, label='Training')
 ax2.scatter(Prop_test_temp[:], Pred_test_temp[:], c='orange', marker='s', s=60, edgecolors='dimgrey', alpha=0.2, label='Test')
-
 te = '%.2f' % rmse_test_hse_gap
 tr = '%.2f' % rmse_train_hse_gap
-
 ax2.text(4.03, 1.65, 'Test_rmse = ', c='r', fontsize=12)
 ax2.text(5.95, 1.65, te, c='r', fontsize=12)
 ax2.text(6.67, 1.65, 'eV', c='r', fontsize=12)
 ax2.text(3.94, 1.10, 'Train_rmse = ', c='r', fontsize=12)
 ax2.text(5.95, 1.10, tr, c='r', fontsize=12)
 ax2.text(6.67, 1.10, 'eV', c='r', fontsize=12)
-
 ax2.set_ylim([0.5, 7.3])
 ax2.set_xlim([0.5, 7.3])
 ax2.set_xticks([1, 3, 5, 7])
 ax2.set_yticks([1, 3, 5, 7])
-
 ax2.set_title('HSE Band Gap (eV)', c='k', fontsize=20, pad=8)
-
-
-
-
-
-
-
-
-
-
-
 
 
 Prop_train_temp = copy.deepcopy(Prop_train_ref_ind_fl)
 Pred_train_temp = copy.deepcopy(Pred_train_ref_ind_fl)
 Prop_test_temp  = copy.deepcopy(Prop_test_ref_ind_fl)
 Pred_test_temp  = copy.deepcopy(Pred_test_ref_ind_fl)
-
-a = [-175,0,125]
-b = [-175,0,125]
-ax3.plot(b, a, c='k', ls='-')
-
 ax3.xaxis.set_tick_params(labelsize=20)
 ax3.yaxis.set_tick_params(labelsize=20)
-
 ax3.scatter(Prop_train_temp[:], Pred_train_temp[:], c='blue', marker='s', s=60, edgecolors='dimgrey', alpha=1.0, label='Training')
 ax3.scatter(Prop_test_temp[:], Pred_test_temp[:], c='orange', marker='s', s=60, edgecolors='dimgrey', alpha=0.2, label='Test')
-
 te = '%.2f' % rmse_test_ref_ind
 tr = '%.2f' % rmse_train_ref_ind
-
 ax3.text(2.30, 1.6, 'Test_rmse = ', c='r', fontsize=12)
 ax3.text(2.85, 1.6, te, c='r', fontsize=12)
 ax3.text(3.05, 1.6, 'eV', c='r', fontsize=12)
 ax3.text(2.28, 1.43, 'Train_rmse = ', c='r', fontsize=12)
 ax3.text(2.85, 1.43, tr, c='r', fontsize=12)
 ax3.text(3.05, 1.43, 'eV', c='r', fontsize=12)
-
 ax3.set_ylim([1.25, 3.25])
 ax3.set_xlim([1.25, 3.25])
 ax3.set_xticks([1.5, 2.0, 2.5, 3.0])
 ax3.set_yticks([1.5, 2.0, 2.5, 3.0])
-
 ax3.set_title('Refractive Index', c='k', fontsize=20, pad=8)
-
-
-
-
-
-
-
-
 
 
 Prop_train_temp = copy.deepcopy(Prop_train_fom_fl)
 Pred_train_temp = copy.deepcopy(Pred_train_fom_fl)
 Prop_test_temp  = copy.deepcopy(Prop_test_fom_fl)
 Pred_test_temp  = copy.deepcopy(Pred_test_fom_fl)
-
-a = [-175,0,125]
-b = [-175,0,125]
-ax4.plot(b, a, c='k', ls='-')
-
 ax4.xaxis.set_tick_params(labelsize=20)
 ax4.yaxis.set_tick_params(labelsize=20)
-
 ax4.scatter(Prop_train_temp[:], Pred_train_temp[:], c='blue', marker='s', s=60, edgecolors='dimgrey', alpha=1.0, label='Training')
 ax4.scatter(Prop_test_temp[:], Pred_test_temp[:], c='orange', marker='s', s=60, edgecolors='dimgrey', alpha=0.2, label='Test')
-
 te = '%.2f' % rmse_test_fom
 tr = '%.2f' % rmse_train_fom
-
 ax4.text(3.61, 2.2, 'Test_rmse = ', c='r', fontsize=12)
 ax4.text(4.7, 2.2, te, c='r', fontsize=12)
 ax4.text(5.1, 2.2, 'eV', c='r', fontsize=12)
 ax4.text(3.55, 1.85, 'Train_rmse = ', c='r', fontsize=12)
 ax4.text(4.7, 1.85, tr, c='r', fontsize=12)
 ax4.text(5.1, 1.85, 'eV', c='r', fontsize=12)
-
 ax4.set_ylim([1.5, 5.5])
 ax4.set_xlim([1.5, 5.5])
 ax4.set_xticks([2.0, 3.0, 4.0, 5.0])
 ax4.set_yticks([2.0, 3.0, 4.0, 5.0])
-
 ax4.set_title('Figure of Merit (log$_{10}$)', c='k', fontsize=20, pad=8)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#plt.tick_params(axis='y', which='both', labelleft=True, labelright=False)
-
-#plt.ylabel('ML Prediction', fontname='Arial Narrow', size=32)
-#plt.xlabel('DFT Calculation', fontname='Arial Narrow', size=32)
-
-#plt.rc('xtick', c='k', labelsize=16)
-#plt.rc('ytick', c='k', labelsize=24)
-
 plt.savefig('plot.eps', dpi=450)
 plt.show()
-
-
-
-
-
 
