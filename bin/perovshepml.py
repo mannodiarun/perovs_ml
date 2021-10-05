@@ -68,30 +68,56 @@ X = csvdata[:,13:]
 # In[34]:
 
 
-# Read Outside Data
-ifile  = open('Outside_norm.csv', "rt")
+    # Read Outside Data
+ifile  = open('Outside_1.csv', "rt")
 reader = csv.reader(ifile)
 csvdata=[]
 for row in reader:
-    csvdata.append(row)
+        csvdata.append(row)
 ifile.close()
 numrow=len(csvdata)
 numcol=len(csvdata[0])
 csvdata = np.array(csvdata).reshape(numrow,numcol)
-Sys_out = csvdata[:,0]
-A_out   = csvdata[:,1]
-B_out   = csvdata[:,2]
-C_out   = csvdata[:,3]
-X_out = csvdata[:,4:]
+M_out = csvdata[:,0]
+MAPbX3_out   = csvdata[:,1]
+X_out_1 = csvdata[:,2:]
+n_out_1 = M_out.size
 
-n_out = C_out.size
 
-YY = copy.deepcopy(Y)
-XX = copy.deepcopy(X)
-n = C.size
-m = int(X.size/n)
-m_y = int(Y.size/n)
-#m_y = 4
+
+    # Read Outside Data
+ifile  = open('Outside_2.csv', "rt")
+reader = csv.reader(ifile)
+csvdata=[]
+for row in reader:
+        csvdata.append(row)
+ifile.close()
+numrow=len(csvdata)
+numcol=len(csvdata[0])
+csvdata = np.array(csvdata).reshape(numrow,numcol)
+Ind_out = csvdata[:,0]
+Comp_out   = csvdata[:,1]
+Type_out   = csvdata[:,2]
+X_out_2 = csvdata[:,3:]
+n_out_2 = Ind_out.size
+
+
+
+    # Read Outside Data
+ifile  = open('Outside_3.csv', "rt")
+reader = csv.reader(ifile)
+csvdata=[]
+for row in reader:
+        csvdata.append(row)
+ifile.close()
+numrow=len(csvdata)
+numcol=len(csvdata[0])
+csvdata = np.array(csvdata).reshape(numrow,numcol)
+Comp_out = csvdata[:,0]
+Type_out   = csvdata[:,1]
+X_out_3 = csvdata[:,2:]
+n_out_3 = Comp_out.size
+
 
 
 # In[35]:
@@ -267,12 +293,23 @@ for i in range(0,n_te):
     Prop_test_pbe_gap_fl[i] = np.float(Prop_test_pbe_gap[i])
     
     
-## Outside Predictions ##
+## Outside Predictions
 
-Pred_out = pipeline_opt.predict(X_out)
-Pred_out_pbe_gap = [0.0]*n_out
-for i in range(0,n_out):
-    Pred_out_pbe_gap[i] = np.float(Pred_out[i])
+Pred_out_1 = pipeline_opt.predict(X_out_1)
+Pred_out_pbe_gap_1 = [0.0]*n_out_1
+for i in range(0,n_out_1):
+    Pred_out_pbe_gap_1[i] = float(Pred_out_1[i])
+
+Pred_out_2 = pipeline_opt.predict(X_out_2)
+Pred_out_pbe_gap_2 = [0.0]*n_out_2
+for i in range(0,n_out_2):
+    Pred_out_pbe_gap_2[i] = float(Pred_out_2[i])
+
+Pred_out_3 = pipeline_opt.predict(X_out_3)
+Pred_out_pbe_gap_3 = [0.0]*n_out_3
+for i in range(0,n_out_3):
+    Pred_out_pbe_gap_3[i] = float(Pred_out_3[i])
+
 
 
 #  Train Model For HSE Band Gap ##
@@ -342,12 +379,23 @@ for i in range(0,n_te):
     Prop_test_hse_gap_fl[i] = np.float(Prop_test_hse_gap[i])
     
     
-## Outside Predictions ##
+## Outside Predictions
 
-Pred_out = pipeline_opt.predict(X_out)
-Pred_out_hse_gap = [0.0]*n_out
-for i in range(0,n_out):
-    Pred_out_hse_gap[i] = np.float(Pred_out[i])
+Pred_out_1 = pipeline_opt.predict(X_out_1)
+Pred_out_hse_gap_1 = [0.0]*n_out_1
+for i in range(0,n_out_1):
+    Pred_out_hse_gap_1[i] = float(Pred_out_1[i])
+
+Pred_out_2 = pipeline_opt.predict(X_out_2)
+Pred_out_hse_gap_2 = [0.0]*n_out_2
+for i in range(0,n_out_2):
+    Pred_out_hse_gap_2[i] = float(Pred_out_2[i])
+
+Pred_out_3 = pipeline_opt.predict(X_out_3)
+Pred_out_hse_gap_3 = [0.0]*n_out_3
+for i in range(0,n_out_3):
+    Pred_out_hse_gap_3[i] = float(Pred_out_3[i])
+
 
 
 #  Train Model For Refractive Index ##
@@ -417,12 +465,23 @@ for i in range(0,n_te):
     Prop_test_ref_ind_fl[i] = np.float(Prop_test_ref_ind[i])
     
     
-## Outside Predictions ##
+## Outside Predictions
 
-Pred_out = pipeline_opt.predict(X_out)
-Pred_out_ref_ind = [0.0]*n_out
-for i in range(0,n_out):
-    Pred_out_ref_ind[i] = np.float(Pred_out[i])
+Pred_out_1 = pipeline_opt.predict(X_out_1)
+Pred_out_ref_ind_1 = [0.0]*n_out_1
+for i in range(0,n_out_1):
+    Pred_out_ref_ind_1[i] = float(Pred_out_1[i])
+
+Pred_out_2 = pipeline_opt.predict(X_out_2)
+Pred_out_ref_ind_2 = [0.0]*n_out_2
+for i in range(0,n_out_2):
+    Pred_out_ref_ind_2[i] = float(Pred_out_2[i])
+
+Pred_out_3 = pipeline_opt.predict(X_out_3)
+Pred_out_ref_ind_3 = [0.0]*n_out_3
+for i in range(0,n_out_3):
+    Pred_out_ref_ind_3[i] = float(Pred_out_3[i])
+
 
 
 #  Train Model For Figure of Merit ##
@@ -492,12 +551,23 @@ for i in range(0,n_te):
     Prop_test_fom_fl[i] = np.float(Prop_test_fom[i])
     
     
-## Outside Predictions ##
+## Outside Predictions
 
-Pred_out = pipeline_opt.predict(X_out)
-Pred_out_fom = [0.0]*n_out
-for i in range(0,n_out):
-    Pred_out_fom[i] = np.float(Pred_out[i])
+Pred_out_1 = pipeline_opt.predict(X_out_1)
+Pred_out_fom_1 = [0.0]*n_out_1
+for i in range(0,n_out_1):
+    Pred_out_fom_1[i] = float(Pred_out_1[i])
+
+Pred_out_2 = pipeline_opt.predict(X_out_2)
+Pred_out_fom_2 = [0.0]*n_out_2
+for i in range(0,n_out_2):
+    Pred_out_fom_2[i] = float(Pred_out_2[i])
+
+Pred_out_3 = pipeline_opt.predict(X_out_3)
+Pred_out_fom_3 = [0.0]*n_out_3
+for i in range(0,n_out_3):
+    Pred_out_fom_3[i] = float(Pred_out_3[i])
+
 
 
 # In[ ]:
@@ -521,15 +591,45 @@ np.savetxt('errors.txt', errors)
 # In[ ]:
 
 
-Pred_out = [[0.0 for a in range(4)] for b in range(n_out)]
+Pred_out_1 = [[0.0 for a in range(4)] for b in range(n_out_1)]
 
-for i in range(0,n_out):
-    Pred_out[i][0] = Pred_out_pbe_gap[i]
-    Pred_out[i][1] = Pred_out_hse_gap[i]
-    Pred_out[i][2] = Pred_out_ref_ind[i]
-    Pred_out[i][3] = Pred_out_fom[i]
-    
-np.savetxt('Pred_out.txt', Pred_out)
+for i in range(0,n_out_1):
+    Pred_out_1[i][0] = Pred_out_pbe_gap_1[i]
+    Pred_out_1[i][1] = Pred_out_hse_gap_1[i]
+    Pred_out_1[i][2] = Pred_out_ref_ind_1[i]
+    Pred_out_1[i][3] = Pred_out_fom_1[i]
+
+np.savetxt('Pred_out_1.txt', Pred_out_1)
+
+
+
+
+
+Pred_out_2 = [[0.0 for a in range(4)] for b in range(n_out_2)]
+
+for i in range(0,n_out_2):
+    Pred_out_2[i][0] = Pred_out_pbe_gap_2[i]
+    Pred_out_2[i][1] = Pred_out_hse_gap_2[i]
+    Pred_out_2[i][2] = Pred_out_ref_ind_2[i]
+    Pred_out_2[i][3] = Pred_out_fom_2[i]
+
+np.savetxt('Pred_out_2.txt', Pred_out_2)
+
+
+
+
+
+Pred_out_3 = [[0.0 for a in range(4)] for b in range(n_out_3)]
+
+for i in range(0,n_out_3):
+    Pred_out_3[i][0] = Pred_out_pbe_gap_3[i]
+    Pred_out_3[i][1] = Pred_out_hse_gap_3[i]
+    Pred_out_3[i][2] = Pred_out_ref_ind_3[i]
+    Pred_out_3[i][3] = Pred_out_fom_3[i]
+
+np.savetxt('Pred_out_3.txt', Pred_out_3)
+
+
 
 
 # In[ ]:
